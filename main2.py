@@ -303,12 +303,6 @@ class ICommand(ABC):
     def execute(self) -> None:
         """Execute the command"""
         pass
-    
-    @abstractmethod
-    def undo(self) -> None:
-        """Undo the command"""
-        pass
-
 
 class RotateFaceCommand(ICommand):
     """
@@ -325,12 +319,6 @@ class RotateFaceCommand(ICommand):
         """Execute the rotation"""
         self.cube.rotate_face(self.face, self.direction)
     
-    def undo(self) -> None:
-        """Undo by rotating in opposite direction"""
-        opposite = (Direction.COUNTER_CLOCKWISE if self.direction == Direction.CLOCKWISE 
-                   else Direction.CLOCKWISE)
-        self.cube.rotate_face(self.face, opposite)
-    
     def __repr__(self) -> str:
         direction_str = "'" if self.direction == Direction.COUNTER_CLOCKWISE else ""
         return f"{self.face.value}{direction_str}"
@@ -339,7 +327,6 @@ class RotateFaceCommand(ICommand):
 class MoveInvoker:
     """
     COMMAND PATTERN: Invoker that executes and tracks commands
-    Maintains command history for undo functionality
     """
     
     def __init__(self):
@@ -350,11 +337,6 @@ class MoveInvoker:
         command.execute()
         self.command_history.append(command)
     
-    def undo_last(self) -> None:
-        """Undo the last command"""
-        if self.command_history:
-            command = self.command_history.pop()
-            command.undo()
 
 
 # ============================================================================
